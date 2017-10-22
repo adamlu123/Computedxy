@@ -24,13 +24,24 @@ GramSchm <- function(A){
   # stopifnot((Q%*%R - A))
   return(list(Q=Q,R=R))
 }
-rslt <- GramSchm(dt)
-
+rslt <- GramSchm(ma)
+GramSchm(ma)
 
 Householder <- function(A){
-
+  n <- nrow(A)
+  p <- ncol(A)
+  U <- matrix(0, n, p )
+  for(k in 1:(p-1) ){
+    w <- A[k:n,k]
+    w[1] <- w[1] - sqrt(sum(w^2))
+    u <- w/sqrt(sum(w^2))
+    U[k:n,k] <- u
+    A[k:n,k:p] <- A[k:n,k:p] - 2*u %*% (t(u) %*% A[k:n,k:p] )
+    # print(A)
+  }
+  return(list(Q=U, R=A[1:p,1:p] ) )
 }
-
+Householder(ma)
 
 
 solve <- function(X,y){
