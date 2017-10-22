@@ -27,21 +27,62 @@ GramSchm <- function(A){
 rslt <- GramSchm(ma)
 GramSchm(ma)
 
+#############
+#############
+U2Q <- function(U){
+  p <- ncol(U)
+  n <- nrow(U)
+  u <- U[,1]
+  H <- diag(1, n)
+  # H <- I- 2 * u %*% t(u)
+  for(i in 1:p){
+    u <- U[,i]
+    I <- diag(1, n)
+    # temp <- diag(1,n)
+    temp <- I-2*u %*% t(u)
+    H <- temp %*% H
+  }
+  return(H)
+}
+
+#############
 Householder <- function(A){
   n <- nrow(A)
   p <- ncol(A)
-  U <- matrix(0, n, p )
-  for(k in 1:(p-1) ){
+  U <- matrix(0, n, p)
+  for(k in 1:p ){
     w <- A[k:n,k]
+    #print(w)
     w[1] <- w[1] - sqrt(sum(w^2))
-    u <- w/sqrt(sum(w^2))
+    # print(w)
+    if(length(w) > 1){
+      u <- w/sqrt(sum(w^2))
+    }else{
+      u <- 0
+    }
     U[k:n,k] <- u
+
     A[k:n,k:p] <- A[k:n,k:p] - 2*u %*% (t(u) %*% A[k:n,k:p] )
-    # print(A)
   }
-  return(list(Q=U, R=A[1:p,1:p] ) )
+  Q = t(U2Q(U))[,1:p]
+
+  return(list(Q=Q, R=A[1:p,1:p] ) )
 }
 Householder(ma)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 solve <- function(X,y){
