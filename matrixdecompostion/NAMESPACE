@@ -3,3 +3,4 @@
 export(GramSchm)
 export(Householder)
 export(U2Q)
+export(updated_lse)
