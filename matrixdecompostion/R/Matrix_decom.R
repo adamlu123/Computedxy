@@ -1,7 +1,8 @@
 #' This function computes the QR decompostion using Gram-Schmidt algorithm
 #' Input matrix object
 #' Output: two matrix Q, and R
-
+dt <- read.csv("Assignment1.csv")
+dt <- dt[1:150,]
 ma <- matrix(1:4, 2, 2)
 
 GramSchm <- function(A){
@@ -28,7 +29,7 @@ rslt <- GramSchm(ma)
 GramSchm(ma)
 
 #############
-#############
+############# used in householder algo to compute orthoganol matrix Q
 U2Q <- function(U){
   p <- ncol(U)
   n <- nrow(U)
@@ -47,27 +48,26 @@ U2Q <- function(U){
 
 #############
 Householder <- function(A){
+  A <- as.matrix(A) # transform datatype: A to double
   n <- nrow(A)
   p <- ncol(A)
   U <- matrix(0, n, p)
   for(k in 1:p ){
     w <- A[k:n,k]
-    #print(w)
     w[1] <- w[1] - sqrt(sum(w^2))
-    # print(w)
     if(length(w) > 1){
       u <- w/sqrt(sum(w^2))
     }else{
       u <- 0
     }
     U[k:n,k] <- u
-
-    A[k:n,k:p] <- A[k:n,k:p] - 2*u %*% (t(u) %*% A[k:n,k:p] )
+    A[k:n,k:p] <- A[k:n,k:p] - 2*u %*% ( t(u) %*% A[k:n,k:p] )
   }
   Q = t(U2Q(U))[,1:p]
-
   return(list(Q=Q, R=A[1:p,1:p] ) )
 }
+# Householder(dt[,1:5])
+
 Householder(ma)
 
 
@@ -85,12 +85,29 @@ Householder(ma)
 
 
 
-solve <- function(X,y){
+get_lse <- function(X,y,algorithm,rep=20){
   #'Input X, response y
   #'Output LSE
+  X <- as.matrix(X)
+  y <- as.matrix(y)
   n <- ncol(X)
   beta <- rep( NA, n)
-  rslt <- GramSchm(X)
+  if(algorithm == 'Householder'){
+    rslt <- Householder(X)
+  }else if(algorithm == 'GramSchm'){
+    rslt <- GramSchm(X)
+  }else if(algorithm == 'Jacobi'){
+    beta <- rep(0,n)
+    for(i in 1:rep){
+      A <- t(X)%*% X
+      b <- t(X) %*% y
+      P <- diag(diag(A))
+      beta <- (diag(1,n) - solve(P)%*%A ) %*% beta + solve(P) %*% b
+    }
+    return(beta)
+  }else{
+    return("Algorithm can only be one of:Householder, GramSchm and Jacobi")
+  }
   Q <- rslt[[1]]
   R <- rslt[[2]]
   rhs <- t(Q) %*% y
@@ -101,12 +118,12 @@ solve <- function(X,y){
       v <- v- R[i,j] * beta[j]
     }
     beta[i] <- v / R[i,i]
-    #print(beta)
   }
   return(beta)
 }
 
-beta <- solve(dt[,1:5], dt[,6] )
+beta <- get_lse(dt[,1:5], dt[,6],algorithm = "Jacobi" ,rep=10)
+beta1 <- get_lse(dt[,1:5], dt[,6],algorithm = "GramSchm" )
 
 
 fit <- lm(y ~ 0+ X1 + X2 + X3 + X4 + X5, data=dt)
