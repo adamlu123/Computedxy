@@ -73,7 +73,10 @@ Householder <- function(A){
     A[k:n,k:p] <- A[k:n,k:p] - 2*u %*% ( t(u) %*% A[k:n,k:p] )
   }
   Q = t(U2Q(U))[,1:p]
-  return(list(Q=Q, R=A[1:p,1:p] ) )
+  R = A[1:p,1:p]
+  R[lower.tri(R, diag = F)] = 0
+
+  return(list(Q=Q, R=R ) )
 }
 
 

@@ -1,5 +1,12 @@
 dt <- read.csv("Assignment1.csv")
 beta <- get_lse(dt[1:150,1:5], dt[1:150,6],algorithm = 'Jacobi',rep=20)
-beta_new <- get_lse(dt[,1:5], dt[,6],algorithm = 'Jacobi',rep=20)
+beta_new <- updated_lse(dt[,1:5], dt[,6],algorithm = 'Jacobi',rep=20)
 
 updated_lse(dt[1:150,1:5],dt[151:200,1:5], dt[1:150,6],dt[151:200,6], beta )
+
+g = GramSchm([1:150,1:5])
+h = Householder(dt[1:150,1:5])
+
+h[[2]][lower.tri(h[[2]], diag = F)] = 0
+
+lm(y~0+X1+X2+X3+X4+X5,data=dt)
