@@ -1,9 +1,11 @@
+#' GramSchm decompostion
+#'
 #' This function computes the QR decompostion using Gram-Schmidt algorithm
-#' Input matrix object
-#' Output: two matrix Q, and R
-dt <- read.csv("Assignment1.csv")
-dt <- dt[1:150,]
-ma <- matrix(1:4, 2, 2)
+#'
+#' @param A the matrix waiting for QR decom
+#' @return  a list of matrx
+#' @export
+
 
 GramSchm <- function(A){
   # initialization
@@ -22,14 +24,15 @@ GramSchm <- function(A){
     R[j,j] <- sqrt(sum(v^2))
     Q[,j] <- v/R[j,j]
   }
-  # stopifnot((Q%*%R - A))
   return(list(Q=Q,R=R))
 }
-rslt <- GramSchm(ma)
-GramSchm(ma)
 
-#############
-############# used in householder algo to compute orthoganol matrix Q
+#' Compute orthognal matrix Q from U
+#'
+#'
+#' @param U Compute orthognal matrix Q from U
+#' @return  matrix Q using householder algorithm
+#' @export
 U2Q <- function(U){
   p <- ncol(U)
   n <- nrow(U)
@@ -46,7 +49,13 @@ U2Q <- function(U){
   return(H)
 }
 
-#############
+#' Householder decompostion
+#'
+#' This function computes the QR decompostion using Householder algorithm
+#'
+#' @param A the matrix waiting for QR decom
+#' @return  a list of matrx
+#' @export
 Householder <- function(A){
   A <- as.matrix(A) # transform datatype: A to double
   n <- nrow(A)
@@ -66,56 +75,8 @@ Householder <- function(A){
   Q = t(U2Q(U))[,1:p]
   return(list(Q=Q, R=A[1:p,1:p] ) )
 }
-# Householder(dt[,1:5])
 
 
-
-
-
-
-get_lse <- function(X,y,algorithm,rep=20){
-  #'Input X, response y
-  #'Output LSE
-  X <- as.matrix(X)
-  y <- as.matrix(y)
-  n <- ncol(X)
-  beta <- rep( NA, n)
-  if(algorithm == 'Householder'){
-    rslt <- Householder(X)
-  }else if(algorithm == 'GramSchm'){
-    rslt <- GramSchm(X)
-  }else if(algorithm == 'Jacobi'){
-    beta <- rep(0,n)
-    for(i in 1:rep){
-      A <- t(X)%*% X
-      b <- t(X) %*% y
-      P <- diag(diag(A))
-      beta <- (diag(1,n) - solve(P)%*%A ) %*% beta + solve(P) %*% b
-    }
-    return(beta)
-  }else{
-    print("Error:  Algorithm can only be one of:Householder, GramSchm and Jacobi")
-  }
-  Q <- rslt[[1]]
-  R <- rslt[[2]]
-  rhs <- t(Q) %*% y
-  beta[n] <- rhs[n] / R[n,n]
-  for(i in (n-1):1){
-    v <- rhs[i]
-    for(j in n:(i+1)){
-      v <- v- R[i,j] * beta[j]
-    }
-    beta[i] <- v / R[i,i]
-  }
-  return(beta)
-}
-
-beta <- get_lse(dt[,1:5], dt[,6],algorithm = "Jacobi" ,rep=10)
-beta1 <- get_lse(dt[,1:5], dt[,6],algorithm = "GramSchm" )
-
-
-fit <- lm(y ~ 0+ X1 + X2 + X3 + X4 + X5, data=dt)
-summary(fit)
 
 
 
