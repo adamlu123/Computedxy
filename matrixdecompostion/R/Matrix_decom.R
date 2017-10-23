@@ -68,18 +68,6 @@ Householder <- function(A){
 }
 # Householder(dt[,1:5])
 
-Householder(ma)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -106,7 +94,7 @@ get_lse <- function(X,y,algorithm,rep=20){
     }
     return(beta)
   }else{
-    return("Algorithm can only be one of:Householder, GramSchm and Jacobi")
+    print("Error:  Algorithm can only be one of:Householder, GramSchm and Jacobi")
   }
   Q <- rslt[[1]]
   R <- rslt[[2]]
